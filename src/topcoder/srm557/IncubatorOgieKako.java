@@ -21,28 +21,29 @@ public class IncubatorOgieKako {
                 }
             }
         }
-        System.out.println("BREAKPOINT");
-
         int m = 0;
         int[] is = new int[n];
-        Arrays.fill(is, -1);
-        for(int i = 0; i < n; i++){
-            if(!myLoveGraph[i][i]){
+        Arrays.fill(is,
+                    - 1);
+        for (int i = 0; i < n; i++) {
+            if (! myLoveGraph[i][i]) {
                 is[i] = m++;
             }
         }
 
         // this part translates the graph to a new graph, which does not contain any self-pointing girls
         boolean[][] myGraph2 = new boolean[m][m];
-        for(int i = 0; i < n; i++){
-            if(!myLoveGraph[i][i]){
-                for(int j = 0; j < n; j++){
-                    if(!myLoveGraph[j][j]){
+        for (int i = 0; i < n; i++) {
+            if (! myLoveGraph[i][i]) {
+                for (int j = 0; j < n; j++) {
+                    if (! myLoveGraph[j][j]) {
                         myGraph2[is[i]][is[j]] = myLoveGraph[i][j];
                     }
                 }
             }
         }
+        // m is the max possible.
+        // bipartite matching finds how many points are grouped together
         return m - GraphAlgorithms.bipartiteMatching(myGraph2);
     }
 
@@ -173,8 +174,58 @@ public class IncubatorOgieKako {
 
 class GraphAlgorithms {
 
-    public static int bipartiteMatching(boolean[][] myGraph2) {
-        return 0;  //To change body of created methods use File | Settings | File Templates.
+    public static int bipartiteMatching(boolean[][] myBipartiteGraph) {
+        int n = myBipartiteGraph.length;
+        if(n==0)return 0;
+        int m = myBipartiteGraph[0].length;
+        int[] match = new int[m];
+        Arrays.fill(match,
+                    -1);
+        int res = 0;
+        for (int i = 0; i < n; i++) {
+            boolean[] visited = new boolean[m];
+            if (go(i,
+                   myBipartiteGraph,
+                   visited,
+                   match))
+                res++;
+        }
+        // the count is how many independent groups there are.
+        return res;
+    }
+
+    private static boolean go(int v, boolean[][] graph, boolean[] visited, int[] lovedBy) {
+        int m = graph[0].length;
+        // for every girl(i)
+        for (int i = 0; i < m; i++) {
+            // if girl(i) not yet visited, girl(v) loves girl(i), girl(i) unloved
+            if (! visited[i] && graph[v][i] && lovedBy[i] == - 1) {
+                // then visited = true, girl(i)'s is loved by girl(v)
+                visited[i] = true;
+                lovedBy[i] = v;
+                return true;
+            }
+        }
+        // since it got here, that means that for all the i's,
+        // it's either been visited or girl(v) doesn't love girl(i) or girl(i) is loved
+
+        // for every girl(i)
+        for (int i = 0; i < m; i++) {
+            // if girl(i) is not yet visited, and girl(v) loves girl(i)
+            if (! visited[i] && graph[v][i]) {
+                // visit girl(i)
+                visited[i] = true;
+                // recursively call go. with the change being that instead of "v" it's now going to i.
+                if (go(lovedBy[i],
+                       graph,
+                       visited,
+                       lovedBy)) {
+                    lovedBy[i] = v;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
