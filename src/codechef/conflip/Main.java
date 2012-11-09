@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
-    //Carvans
+    //Conflip
 
     public static void main(String[] args) throws IOException {
         BufferedReader myBufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -13,26 +13,29 @@ public class Main {
         int myNumberOfTestCases = Integer.parseInt(myBufferedReader.readLine());
 
         for (int i = 0; i < myNumberOfTestCases; i++) {
-            int myNumberOfCars = Integer.parseInt(myBufferedReader.readLine());
-            int[] myIntCarSpeeds = getCarSpeeds(myBufferedReader);
-            int myNumMaxSpeedCars = getNumberOfMaxSpeedCars(myIntCarSpeeds);
-            System.out.println(myNumMaxSpeedCars);
-        }
-    }
-
-    private static int getNumberOfMaxSpeedCars(int[] myIntCarSpeeds) {
-        int myNumberOfMaxSpeedCars = 0;
-        int myCurrentLowestSpeed = Integer.MAX_VALUE;
-        for (int myMaxSpeed : myIntCarSpeeds) {
-            if (myMaxSpeed <= myCurrentLowestSpeed) {
-                myCurrentLowestSpeed = myMaxSpeed;
-                myNumberOfMaxSpeedCars++;
+            int myNumberOfGames = Integer.parseInt(myBufferedReader.readLine());
+            for(int j = 0; j < myNumberOfGames; j++){
+                int[] myCoinParams = getCoinParams(myBufferedReader);
+                int myAnswer = countCoins(myCoinParams);
+                System.out.println(myAnswer);
             }
         }
-        return myNumberOfMaxSpeedCars;
     }
 
-    private static int[] getCarSpeeds(BufferedReader myBufferedReader) throws IOException {
+    private static int countCoins(int[] myCoinParams) {
+        int n = myCoinParams[1];
+        int i = myCoinParams[0];
+        int q = myCoinParams[2];
+        if(n % 2 == 0){
+            return n / 2;
+        }
+        if(i == q){
+            return n / 2;
+        }
+        return n / 2 + 1;
+    }
+
+    private static int[] getCoinParams(BufferedReader myBufferedReader) throws IOException {
         String[] myCarSpeeds = myBufferedReader.readLine().split(" ");
         int[] myIntCarSpeeds = new int[myCarSpeeds.length];
         for (int j = 0; j < myCarSpeeds.length; j++) {
