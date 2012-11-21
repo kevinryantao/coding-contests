@@ -53,23 +53,36 @@ public class Solution {
     static Coordinate nextMove(boolean[][] board) {
         PriorityQueue<Coordinate> myCoordinateList = getCoordinateQueue(board);
         Coordinate myBestCoordinateSoFar = getTopLeftMost(board);
-        int myLowestNumberOfOuts = Integer.MAX_VALUE;
+        double myLowestOppFavorScore = Double.MAX_VALUE;
         if (myCoordinateList.size() <= 24) {
             for (Coordinate myCoordinate : myCoordinateList) {
-                boolean[][] myHypotheticalBoard = deepCopyBooleanArray(board);
-                myHypotheticalBoard = turnOff(myHypotheticalBoard,
-                                              myCoordinate);
+                boolean[][] myHypotheticalBoard = turnOff(deepCopyBooleanArray(board),
+                                                          myCoordinate);
                 int mySimulatedNumberOfSteps = getSimulatedNumberOfSteps(myHypotheticalBoard);
                 if (mySimulatedNumberOfSteps % 2 == 0) {
-                    boolean[][] myHypotheticalBoardCopy = deepCopyBooleanArray(board);
-                    myHypotheticalBoardCopy = turnOff(myHypotheticalBoard,
-                                                  myCoordinate);
-                    int numberOfOuts = numberOfOpponentOuts(myHypotheticalBoardCopy);
-                    if (numberOfOuts == 0) {
+                    boolean[][] myHypotheticalBoardCopy = turnOff(deepCopyBooleanArray(board),
+                                                                  myCoordinate);
+                    double myOppFavorScore = favorScore(myHypotheticalBoardCopy);
+                    if (myOppFavorScore == 0) {
                         return myCoordinate;
-                    } else if (numberOfOuts < myLowestNumberOfOuts) {
+                    } else if (myOppFavorScore < myLowestOppFavorScore) {
                         myBestCoordinateSoFar = myCoordinate;
-                        myLowestNumberOfOuts = numberOfOuts;
+                        myLowestOppFavorScore = myOppFavorScore;
+                    }
+                }
+            }
+            // it's possible that we did not find any of out own potential "outs" via the naive method,
+            // in this case, look for all coordinates that may lead to opponent losses.
+            if (myLowestOppFavorScore == Double.MAX_VALUE) {
+                for (Coordinate myCoordinate : myCoordinateList) {
+                    boolean[][] myHypotheticalBoard = turnOff(deepCopyBooleanArray(board),
+                                                              myCoordinate);
+                    double myOppFavorScore = favorScore(myHypotheticalBoard);
+                    if (myOppFavorScore == 0) {
+                        return myCoordinate;
+                    } else if (myOppFavorScore < myLowestOppFavorScore) {
+                        myBestCoordinateSoFar = myCoordinate;
+                        myLowestOppFavorScore = myOppFavorScore;
                     }
                 }
             }
@@ -77,14 +90,34 @@ public class Solution {
         return myBestCoordinateSoFar;
     }
 
+    static double favorScore(boolean[][] board) {
+        PriorityQueue<Coordinate> myCoordinateList = getCoordinateQueue(board);
+        double favorScore = 0;
+        if (myCoordinateList.size() <= 26) {
+            for (Coordinate myCoordinate : myCoordinateList) {
+                boolean[][] myHypotheticalBoard = turnOff(deepCopyBooleanArray(board),
+                                                          myCoordinate);
+                int mySimulatedNumberOfSteps = getSimulatedNumberOfSteps(myHypotheticalBoard);
+                if (mySimulatedNumberOfSteps % 2 == 0) {
+                    favorScore++;
+                    boolean[][] myHypotheticalBoardCopy = deepCopyBooleanArray(board);
+                    myHypotheticalBoardCopy = turnOff(myHypotheticalBoardCopy,
+                                                      myCoordinate);
+                    int opponentOuts = numberOfOpponentOuts(myHypotheticalBoardCopy);
+                    favorScore -= opponentOuts / (myCoordinateList.size() + 1);
+                }
+            }
+        }
+        return favorScore;
+    }
+
     static int numberOfOpponentOuts(boolean[][] board) {
         PriorityQueue<Coordinate> myCoordinateList = getCoordinateQueue(board);
         int numberOfOpponentOuts = 0;
         if (myCoordinateList.size() <= 25) {
             for (Coordinate myCoordinate : myCoordinateList) {
-                boolean[][] myHypotheticalBoard = deepCopyBooleanArray(board);
-                myHypotheticalBoard = turnOff(myHypotheticalBoard,
-                                              myCoordinate);
+                boolean[][] myHypotheticalBoard = turnOff(deepCopyBooleanArray(board),
+                                                          myCoordinate);
                 int mySimulatedNumberOfSteps = getSimulatedNumberOfSteps(myHypotheticalBoard);
                 if (mySimulatedNumberOfSteps % 2 == 0) {
                     numberOfOpponentOuts++;
