@@ -9,6 +9,8 @@ import java.util.regex.*;
 public class Solution {
 
     public static void main(String[] args) {
+
+
         /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
         Scanner scanner = new Scanner(System.in);
         int nCircles;
@@ -31,6 +33,21 @@ public class Solution {
 
         Solution solution = new Solution();
         System.out.println(solution.run(radii, arrows));
+
+        /*
+        int[] radii = new int[10000];
+        for (int i = 0; i < 10000; i++) {
+            radii[i] = (i + 1) * 10;
+        }
+        Arrow[] arrows = new Arrow[10000];
+        for (int i = 0; i < 10000; i++) {
+            arrows[i] = new Arrow((int) (Math.random() * 100000), (int) (Math.random() * 100000), (int) (Math.random() * 100000), (int) (Math.random() * 100000));
+        }
+
+        Solution solution = new Solution();
+        System.out.println(solution.run(radii, arrows));
+        */
+
     }
 
     public long run(int[] radii, Arrow[] arrows) {
@@ -61,20 +78,13 @@ public class Solution {
 
             int floorNumCircles = radiusMap[floorMaxR] - radiusMap[floorMinR];
 
-            int ceilMinR = (int) Math.ceil(minR);
-            int ceilMaxR = (int) Math.ceil(maxR);
-
-            int ceilNumCircles = radiusMap[ceilMaxR] - radiusMap[ceilMinR];
-
-            int numCircles = Math.max(floorNumCircles, ceilNumCircles);
-
-            count += numCircles;
+            count += floorNumCircles;
 
         }
         return count;
     }
 
-    public static double getR(int x, int y) {
+    public static double getR(long x, long y) {
         return Math.sqrt(x * x + y * y);
     }
 
