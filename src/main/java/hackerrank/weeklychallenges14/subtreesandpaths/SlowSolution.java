@@ -1,20 +1,16 @@
 package hackerrank.weeklychallenges14.subtreesandpaths;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
 
 
 /**
  * https://www.hackerrank.com/contests/w14/challenges/subtrees-and-paths
  */
-public class Solution {
+public class SlowSolution {
     public static void main(String[] args) {
         /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
         Scanner scanner = new Scanner(System.in);
@@ -84,44 +80,42 @@ public class Solution {
 
         int commonAncestorId = 1;
         int commonAncestorIndex = 0;
-        int commonAncestorSum = 0;
 
         for (int j = 0; j < parentChain1.size() && j < parentChain2.size(); j++) {
             if (parentChain1.get(j).equals(parentChain2.get(j))) {
                 commonAncestorId = parentChain1.get(j);
                 commonAncestorIndex = j;
-                commonAncestorSum += nodeDirectory.get(commonAncestorId).value;
             } else {
                 break;
             }
         }
 
-        List<Integer> parentSubchain1 = parentChain1.subList(commonAncestorIndex + 1, parentChain1.size());
+        List<Integer> path = findPath(parentChain1, parentChain2, commonAncestorId, commonAncestorIndex);
 
-        List<Integer> parentSubchain2 = parentChain2.subList(commonAncestorIndex + 1, parentChain2.size());
-
-
-        //List<Integer> path = findPath(parentChain1, parentChain2, commonAncestorId, commonAncestorIndex);
-
-        int maxSoFar = commonAncestorSum;
-        int valueSoFar = commonAncestorSum;
-        for (int index : parentSubchain1) {
+        int maxSoFar = Integer.MIN_VALUE;
+        for (int index : path) {
             int value = nodeDirectory.get(index).value;
-            valueSoFar += value;
-            if (valueSoFar > maxSoFar) {
-                maxSoFar = valueSoFar;
-            }
-        }
-        valueSoFar = commonAncestorSum;
-        for (int index : parentSubchain2) {
-            int value = nodeDirectory.get(index).value;
-            valueSoFar += value;
-            if (valueSoFar > maxSoFar) {
-                maxSoFar = valueSoFar;
+            if (value > maxSoFar) {
+                maxSoFar = value;
             }
         }
 
         return maxSoFar;
+    }
+
+    private static List<Integer> findPath(List<Integer> parentChain1, List<Integer> parentChain2, int commonAncestorId, int commonAncestorIndex) {
+        List<Integer> path = new ArrayList<Integer>();
+        for (int i = parentChain1.size() - 1; i > commonAncestorIndex; i--) {
+            path.add(parentChain1.get(i));
+        }
+
+        path.add(commonAncestorId);
+
+        for (int i = commonAncestorIndex + 1; i < parentChain2.size(); i++) {
+            path.add(parentChain2.get(i));
+        }
+
+        return path;
     }
 
     private static class Node {
@@ -145,6 +139,10 @@ public class Solution {
 
         private void addValue(int valueToAdd) {
             value += valueToAdd;
+            for (Node child : children) {
+                child.addValue(valueToAdd);
+            }
+            // todo: will my call stack blow up? recursive calls like this are probably not ideal. I need to test this on a 10k node deep tree
         }
 
         private List<Integer> getParentChain() {
