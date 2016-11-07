@@ -16,9 +16,6 @@ public class Solution {
         char[] seats = scanner.nextLine().toCharArray();
 
         System.out.println(findSeat(seats));
-
-
-
     }
 
     private static int findSeat(char[] seats) {
@@ -44,6 +41,8 @@ public class Solution {
         int currentChainLength = 1;
         int currentChainStart = openSeats.get(1);
 
+        int firstChainOver2Start = -1;
+
 
         for(int i : openSeats){
             if(i == lastOpenSeat + 1){
@@ -53,6 +52,9 @@ public class Solution {
                 if(currentChainLength > longestChainLength) {
                     longestChainLength = currentChainLength;
                     longestChainStart = currentChainStart;
+                    if(firstChainOver2Start == -1 && longestChainLength >=2){
+                        firstChainOver2Start = longestChainStart;
+                    }
                 }
                 currentChainStart = i;
                 currentChainLength = 1;
@@ -67,7 +69,10 @@ public class Solution {
             return openSeats.get(openSeats.size() - 1);
         }
         if(longestChainLength == 2){
-            return longestChainStart;
+            return longestChainStart + 1;
+        }
+        if(firstChainOver2Start != -1){
+            return firstChainOver2Start + 1;
         }
         return longestChainStart + 1;
     }
